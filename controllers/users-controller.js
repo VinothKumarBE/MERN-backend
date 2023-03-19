@@ -20,7 +20,7 @@ const signup = async (req, res, next) =>{
     if(!errors.isEmpty()){
       return next ( new HttpError('Invalid inputs passed, places check your data.',422));
     }
-    const{name, email, image, password}= req.body;
+    const{name, email, password}= req.body;
     let existingUser
 try{
       existingUser =  await User.findOne({email: email})
@@ -37,9 +37,9 @@ if(existingUser){
     const createdUser = new User({
         name,
         email,
-        image,
+        image:"https://cdn.vectorstock.com/i/1000x1000/30/97/flat-business-man-user-profile-avatar-icon-vector-4333097.webp",
         password,
-        places:[]
+        places:  []
     });
     
 try{
@@ -64,16 +64,18 @@ const login= async(req, res,next) =>{
 try{
          existingUser = await User.findOne({email: email})
 }catch(err){
-        const error = new HttpError('something coming wrong place go back, login error',500);
+        const error = new HttpError('Login failed, please try again',500);
         return next(error);
     }
     if(!existingUser || existingUser.password !== password){
-        const error = new HttpError('In validcredentials, could not log you',401);
+        const error = new HttpError('Invalid credentials, could not log you in',401);
         return next(error)
     }
 
     
-  res.json({message:'Looged in!'});
+  res.json({
+    message:'Looged in!', 
+  user: existingUser.toObject({getters: true})});
 
 };
 
